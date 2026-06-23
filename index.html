@@ -572,6 +572,20 @@ main{padding-top:56px;min-height:100vh}
 <div class="toast" id="toast"></div>
 
 <script>
+// ── Verificação de versão — incrementar APP_VER a cada publicação ──
+(function(){
+  var V='5';
+  if(localStorage.getItem('vm-ver')!==V){
+    localStorage.setItem('vm-ver',V);
+    if('caches'in window){
+      caches.keys().then(function(ks){
+        return Promise.all(ks.map(function(k){return caches.delete(k);}));
+      }).then(function(){location.reload(true);});
+    } else {
+      location.reload(true);
+    }
+  }
+})();
 // ═══════════════════════════════════════════════════════════════
 // DADOS
 // ═══════════════════════════════════════════════════════════════
