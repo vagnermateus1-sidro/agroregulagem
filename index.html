@@ -1384,7 +1384,18 @@ document.addEventListener('DOMContentLoaded',()=>{
   renderChipsEngs([10,12,14,16,18,20,22,24,26,28,30]);
   initAutocompletes();
 });
-if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then(reg => {
+    reg.addEventListener('updatefound', () => {
+      const novo = reg.installing;
+      if (!novo) return;
+      novo.addEventListener('statechange', () => {
+        if (novo.state === 'activated') window.location.reload();
+      });
+    });
+  }).catch(() => {});
+  navigator.serviceWorker.addEventListener('controllerchange', () => window.location.reload());
+}
 </script>
 </body>
 </html>
