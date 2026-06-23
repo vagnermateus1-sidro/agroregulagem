@@ -1,4 +1,4 @@
-const CACHE = 'vm-agro-v5';
+const CACHE = 'vm-agro-v8';
 const ARQUIVOS = ['./index.html', './manifest.json', './logo.jpg'];
 
 self.addEventListener('install', e => {
