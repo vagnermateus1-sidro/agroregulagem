@@ -132,6 +132,20 @@ main{padding-top:56px;min-height:100vh}
 .cult-sel{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:11px}
 .cult-btn{border:2px solid var(--vm);border-radius:8px;padding:8px 4px;font-size:11px;font-weight:600;color:var(--vm);background:#fff;cursor:pointer;text-align:center;transition:all .15s}
 .cult-btn.on{background:var(--vm);color:#fff}
+/* AUTOCOMPLETE */
+.ac-list{position:absolute;top:100%;left:0;right:0;z-index:300;background:#fff;border:1.5px solid var(--vm);border-top:none;border-radius:0 0 8px 8px;max-height:210px;overflow-y:auto;box-shadow:0 4px 14px rgba(0,0,0,.15)}
+.ac-item{padding:11px 13px;cursor:pointer;font-size:13px;border-bottom:1px solid #f0f0f0;line-height:1.2}
+.ac-item:hover,.ac-item:active{background:var(--vc)}
+.ac-item:last-child{border-bottom:none}
+/* CLIENTE CARD */
+.cli-card{background:#fff;border-radius:9px;padding:11px;margin-bottom:7px;box-shadow:0 1px 4px rgba(0,0,0,.08);border-left:4px solid var(--vm)}
+.cli-card .cli-nome{font-size:14px;font-weight:700;margin-bottom:2px}
+.cli-card .cli-faz{font-size:12px;color:var(--vm);font-weight:600}
+.cli-card .cli-inf{font-size:11px;color:#666;margin-top:3px;display:flex;flex-wrap:wrap;gap:8px}
+.cli-card .cli-btns{display:flex;gap:7px;margin-top:8px}
+.cli-card .cli-btns button{flex:1;padding:7px;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer}
+.cli-card .cli-btns .b-ed{background:var(--vc);color:var(--v)}
+.cli-card .cli-btns .b-del{background:#FFEBEE;color:var(--rd)}
 </style>
 </head>
 <body>
@@ -157,6 +171,7 @@ main{padding-top:56px;min-height:100vh}
     <button class="modbtn" onclick="ir('pulverizadores')"><span class="ic">💧</span><span class="lb">Pulverizadores</span></button>
     <button class="modbtn" onclick="ir('distribuidores')"><span class="ic">🚜</span><span class="lb">Distribuidores</span></button>
     <button class="modbtn" onclick="ir('banco-dados')"><span class="ic">📚</span><span class="lb">Banco de Dados</span></button>
+    <button class="modbtn" onclick="ir('clientes')"><span class="ic">👥</span><span class="lb">Clientes e Fazendas</span></button>
     <button class="modbtn" onclick="ir('relatorio')"><span class="ic">📋</span><span class="lb">Relatório de Campo</span></button>
     <button class="modbtn" onclick="ir('historico')"><span class="ic">📈</span><span class="lb">Histórico</span></button>
   </div>
@@ -532,6 +547,27 @@ main{padding-top:56px;min-height:100vh}
   <button class="btn btn-rd" onclick="limparHist()" style="margin-top:8px">🗑️ Limpar Histórico</button>
 </div>
 
+<!-- ══ CLIENTES E FAZENDAS ════════════════════════════════════ -->
+<div id="screen-clientes" class="screen">
+  <div class="card" id="cli-form-card">
+    <div class="ctit vm">Cadastrar / Editar Cliente</div>
+    <input type="hidden" id="cli-id">
+    <div class="campo"><label>Produtor / Proprietário</label><input id="cli-prod" type="text" placeholder="Nome completo" autocomplete="off"></div>
+    <div class="campo"><label>Fazenda</label><input id="cli-faz" type="text" placeholder="Nome da fazenda" autocomplete="off"></div>
+    <div class="row2">
+      <div class="campo"><label>Município</label><input id="cli-mun" type="text" placeholder="Cidade-UF" autocomplete="off"></div>
+      <div class="campo"><label>Telefone</label><input id="cli-tel" type="tel" placeholder="(67) 9 ...."></div>
+    </div>
+    <div class="campo"><label>Área total (ha)</label><input id="cli-area" type="number" step="0.1" placeholder="Ex: 350"></div>
+    <div class="btn-row">
+      <button class="btn btn-v" onclick="salvarClienteDB()">💾 Salvar</button>
+      <button class="btn btn-cz" onclick="limparFormCliente()">✖ Cancelar</button>
+    </div>
+  </div>
+  <div class="busca-w"><span class="ic">🔍</span><input id="cli-busca" type="text" placeholder="Buscar produtor ou fazenda..." oninput="renderClientesLista(this.value)" autocomplete="off"></div>
+  <div id="cli-lista"></div>
+</div>
+
 </main>
 <div class="toast" id="toast"></div>
 
@@ -637,6 +673,7 @@ const TITULOS = {
   pulverizadores: ['Regulagem de Pulverizadores','Barra e autopropelido'],
   distribuidores: ['Distribuidores de Fertilizantes','Adubação linha e lanço'],
   'banco-dados':  ['Banco de Dados','Fabricantes e Modelos'],
+  clientes:       ['Clientes e Fazendas','Cadastro de produtores'],
   relatorio:      ['Relatório de Campo','Para entrega ao produtor'],
   historico:      ['Histórico de Regulagens','Registros salvos'],
 };
@@ -658,6 +695,7 @@ function ir(tela) {
   else { bb.classList.add('on'); lg.style.display='none'; }
   if (tela === 'banco-dados') { renderChipsMarca(); renderBD(BD); }
   if (tela === 'historico') renderHistorico();
+  if (tela === 'clientes') renderClientesLista();
   if (tela === 'combinacoes') renderChipsEngs(Array.from(engsSelecionadas));
   window.scrollTo(0,0);
 }
@@ -1130,6 +1168,213 @@ function hoje(){return new Date().toISOString().slice(0,10);}
 function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500);}
 
 // ═══════════════════════════════════════════════════════════════
+// AUTOCOMPLETE ENGINE
+// ═══════════════════════════════════════════════════════════════
+const FABRICANTES = [...new Set(BD.map(m => m.fab))].sort();
+
+function setupAC(inputId, getItems, onPick) {
+  const inp = document.getElementById(inputId);
+  if (!inp) return;
+  inp.setAttribute('autocomplete', 'off');
+  let drop = null;
+
+  function hide() { if (drop) { drop.remove(); drop = null; } }
+
+  inp.addEventListener('input', function () {
+    hide();
+    const val = this.value.trim();
+    if (!val) return;
+    const items = getItems(val).slice(0, 8);
+    if (!items.length) return;
+    drop = document.createElement('div');
+    drop.className = 'ac-list';
+    items.forEach(item => {
+      const d = document.createElement('div');
+      d.className = 'ac-item';
+      d.textContent = typeof item === 'string' ? item : item.label;
+      d.addEventListener('mousedown', e => {
+        e.preventDefault();
+        inp.value = typeof item === 'string' ? item : (item.value || item.label);
+        onPick && onPick(item);
+        hide();
+      });
+      drop.appendChild(d);
+    });
+    const par = inp.parentNode;
+    if (getComputedStyle(par).position === 'static') par.style.position = 'relative';
+    par.appendChild(drop);
+  });
+
+  inp.addEventListener('blur', () => setTimeout(hide, 200));
+}
+
+function getFabSugestoes(val) {
+  const t = val.toLowerCase();
+  return FABRICANTES.filter(f => f.toLowerCase().includes(t));
+}
+
+function getModSugestoes(fab, val) {
+  const t = val.toLowerCase();
+  return BD
+    .filter(m => (!fab || m.fab === fab) && m.mod.toLowerCase().includes(t))
+    .map(m => ({ label: m.mod + '  (' + m.lin + 'L · ' + m.esp + 'cm · ' + m.disco + ')', value: m.mod, m }));
+}
+
+function setupFabMod(pref) {
+  setupAC(pref + '-fab', getFabSugestoes, null);
+  setupAC(pref + '-mod',
+    val => {
+      const fab = (document.getElementById(pref + '-fab') || {}).value || '';
+      return getModSugestoes(fab, val);
+    },
+    item => {
+      if (!item || !item.m) return;
+      const m = item.m;
+      const fabEl = document.getElementById(pref + '-fab');
+      const espEl = document.getElementById(pref + '-esp');
+      const linEl = document.getElementById(pref + '-lin');
+      const discEl = document.getElementById(pref + '-disc');
+      if (fabEl && !fabEl.value) fabEl.value = m.fab;
+      if (espEl) { espEl.value = m.esp; espEl.dispatchEvent(new Event('input')); }
+      if (linEl) linEl.value = m.lin;
+      if (discEl) discEl.value = m.disco;
+    }
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BANCO DE CLIENTES
+// ═══════════════════════════════════════════════════════════════
+const CLI_KEY = 'vm-clientes';
+
+function getClientes() {
+  return JSON.parse(localStorage.getItem(CLI_KEY) || '[]');
+}
+
+function salvarClienteDB() {
+  const prod = (document.getElementById('cli-prod').value || '').trim();
+  const faz  = (document.getElementById('cli-faz').value  || '').trim();
+  if (!prod && !faz) { toast('Informe produtor ou fazenda'); return; }
+  const idEl = document.getElementById('cli-id');
+  const dados = {
+    id:        idEl.value ? Number(idEl.value) : Date.now(),
+    produtor:  prod,
+    fazenda:   faz,
+    municipio: (document.getElementById('cli-mun').value  || '').trim(),
+    telefone:  (document.getElementById('cli-tel').value  || '').trim(),
+    area:      (document.getElementById('cli-area').value || '').trim(),
+  };
+  const list = getClientes();
+  const idx = list.findIndex(c => c.id === dados.id);
+  if (idx >= 0) list[idx] = dados; else list.unshift(dados);
+  localStorage.setItem(CLI_KEY, JSON.stringify(list));
+  limparFormCliente();
+  renderClientesLista();
+  toast('Cliente salvo!');
+}
+
+function excluirCliente(id) {
+  if (!confirm('Excluir este cliente?')) return;
+  localStorage.setItem(CLI_KEY, JSON.stringify(getClientes().filter(c => c.id !== id)));
+  renderClientesLista();
+  toast('Cliente excluído');
+}
+
+function editarCliente(id) {
+  const c = getClientes().find(c => c.id === id);
+  if (!c) return;
+  document.getElementById('cli-id').value   = c.id;
+  document.getElementById('cli-prod').value = c.produtor  || '';
+  document.getElementById('cli-faz').value  = c.fazenda   || '';
+  document.getElementById('cli-mun').value  = c.municipio || '';
+  document.getElementById('cli-tel').value  = c.telefone  || '';
+  document.getElementById('cli-area').value = c.area      || '';
+  document.getElementById('cli-form-card').scrollIntoView({ behavior: 'smooth' });
+}
+
+function limparFormCliente() {
+  ['cli-id','cli-prod','cli-faz','cli-mun','cli-tel','cli-area'].forEach(id => {
+    const e = document.getElementById(id); if (e) e.value = '';
+  });
+}
+
+function renderClientesLista(filtro) {
+  let list = getClientes();
+  if (filtro) {
+    const t = filtro.toLowerCase();
+    list = list.filter(c =>
+      (c.produtor  || '').toLowerCase().includes(t) ||
+      (c.fazenda   || '').toLowerCase().includes(t) ||
+      (c.municipio || '').toLowerCase().includes(t)
+    );
+  }
+  const el = document.getElementById('cli-lista');
+  if (!el) return;
+  if (!list.length) {
+    el.innerHTML = '<div class="vazio"><div class="ic">👥</div><p>Nenhum cliente cadastrado ainda.<br>Use o formulário acima para adicionar.</p></div>';
+    return;
+  }
+  el.innerHTML = list.map(c => `
+    <div class="cli-card">
+      <div class="cli-nome">${c.produtor || '—'}</div>
+      <div class="cli-faz">🌾 ${c.fazenda || '—'}</div>
+      <div class="cli-inf">
+        ${c.municipio ? '<span>📍 ' + c.municipio + '</span>' : ''}
+        ${c.telefone  ? '<span>📞 ' + c.telefone  + '</span>' : ''}
+        ${c.area      ? '<span>📐 ' + c.area + ' ha</span>'  : ''}
+      </div>
+      <div class="cli-btns">
+        <button class="b-ed"  onclick="editarCliente(${c.id})">✏️ Editar</button>
+        <button class="b-del" onclick="excluirCliente(${c.id})">🗑️ Excluir</button>
+      </div>
+    </div>`).join('');
+}
+
+function getClienteSugestoes(campo, val) {
+  const t = val.toLowerCase();
+  return getClientes()
+    .filter(c => (c[campo] || '').toLowerCase().includes(t))
+    .slice(0, 6)
+    .map(c => ({ label: c[campo], value: c[campo], c }));
+}
+
+function setupClienteAC(pref) {
+  setupAC(pref + '-prod',
+    val => getClienteSugestoes('produtor', val),
+    item => {
+      if (!item || !item.c) return;
+      const c = item.c;
+      const fazEl = document.getElementById(pref + '-faz');
+      const munEl = document.getElementById(pref + '-mun');
+      if (fazEl && !fazEl.value) fazEl.value = c.fazenda   || '';
+      if (munEl && !munEl.value) munEl.value = c.municipio || '';
+    }
+  );
+  setupAC(pref + '-faz',
+    val => getClienteSugestoes('fazenda', val),
+    item => {
+      if (!item || !item.c) return;
+      const c = item.c;
+      const prodEl = document.getElementById(pref + '-prod');
+      const munEl  = document.getElementById(pref + '-mun');
+      if (prodEl && !prodEl.value) prodEl.value = c.produtor  || '';
+      if (munEl  && !munEl.value)  munEl.value  = c.municipio || '';
+    }
+  );
+}
+
+function initAutocompletes() {
+  setupFabMod('s');
+  setupFabMod('m');
+  setupFabMod('o');
+  setupAC('pv-fab', getFabSugestoes, null);
+  setupAC('d-fab',  getFabSugestoes, null);
+  setupClienteAC('s');
+  setupClienteAC('m');
+  setupClienteAC('o');
+}
+
+// ═══════════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded',()=>{
@@ -1137,6 +1382,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   ['s-data','m-data','o-data'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=hj;});
   selecionarCultura('Algodão');
   renderChipsEngs([10,12,14,16,18,20,22,24,26,28,30]);
+  initAutocompletes();
 });
 if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
 </script>
