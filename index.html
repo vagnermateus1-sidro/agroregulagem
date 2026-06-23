@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1B6B2F">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AgroRegulagem">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>VM AgroRegulagem PRO</title>
+<link rel="manifest" href="manifest.json">
+<style>
+:root{--v:#1B6B2F;--vm:#2E8B57;--vc:#E8F5E9;--am:#FFD600;--ac:#FFFDE7;--br:#FFF;--cz:#F5F5F5;--tx:#1A3A1A;--rd:#C62828;--ok:#2E7D32;--or:#E65100}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--cz);color:var(--tx);font-size:14px}
+/* HEADER */
+.hdr{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--v);color:#fff;display:flex;align-items:center;gap:9px;padding:9px 13px;height:56px;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.hdr img{height:34px;width:34px;border-radius:6px;object-fit:cover}
+.hdr .ti{flex:1;min-width:0}
+.hdr .ti h1{font-size:14px;font-weight:700;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hdr .ti small{font-size:10px;opacity:.8}
+.bkbtn{background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:6px;padding:6px 10px;font-size:13px;cursor:pointer;display:none;align-items:center;gap:4px;white-space:nowrap}
+.bkbtn.on{display:flex}
+main{padding-top:56px;min-height:100vh}
+.screen{display:none;padding:12px}
+.screen.active{display:block}
+/* DASHBOARD */
+.dash-banner{background:linear-gradient(135deg,var(--v) 0%,var(--vm) 100%);border-radius:12px;padding:14px;margin-bottom:12px;display:flex;align-items:center;gap:12px;color:#fff}
+.dash-banner img{height:52px;width:52px;border-radius:8px;object-fit:cover}
+.dash-banner h2{font-size:15px;font-weight:700}
+.dash-banner p{font-size:11px;opacity:.85;margin-top:2px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.grid.full{grid-template-columns:1fr}
+.modbtn{background:#fff;border:none;border-radius:11px;padding:13px 9px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.08);border-left:4px solid var(--vm);transition:transform .1s}
+.modbtn:active{transform:scale(.97)}
+.modbtn .ic{font-size:26px}
+.modbtn .lb{font-size:11px;font-weight:600;color:var(--v);line-height:1.2}
+.modbtn.am{border-left-color:var(--am)}
+.modbtn.am .lb{color:#6B5000}
+.modbtn.dest{border-left-color:var(--rd)}
+.modbtn.dest .lb{color:var(--rd)}
+/* CARDS */
+.card{background:#fff;border-radius:11px;padding:13px;margin-bottom:11px;box-shadow:0 2px 6px rgba(0,0,0,.06)}
+.ctit{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#fff;background:var(--v);margin:-13px -13px 11px;padding:8px 13px;border-radius:11px 11px 0 0}
+.ctit.am{background:var(--am);color:var(--tx)}
+.ctit.vm{background:var(--vm)}
+.ctit.or{background:var(--or)}
+/* CAMPOS */
+.campo{margin-bottom:10px}
+.campo label{font-size:12px;font-weight:600;color:var(--v);display:block;margin-bottom:3px}
+.campo input,.campo select,.campo textarea{width:100%;border:1.5px solid #DDD;border-radius:7px;padding:9px 11px;font-size:14px;background:var(--cz);color:var(--tx);outline:none;-webkit-appearance:none}
+.campo input:focus,.campo select:focus{border-color:var(--vm);background:#fff}
+.campo textarea{resize:vertical;min-height:60px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
+/* RESULTADOS */
+.res{background:var(--vc);border-radius:8px;padding:11px;margin-bottom:9px;border-left:4px solid var(--vm)}
+.res label{font-size:11px;font-weight:600;color:var(--v)}
+.res .vl{font-size:20px;font-weight:700;color:var(--v)}
+.res .un{font-size:11px;color:var(--vm)}
+.res.al{border-left-color:var(--rd);background:#FFEBEE}
+.res.al .vl,.res.al label{color:var(--rd)}
+.res.ok2{border-left-color:var(--ok)}
+.res.am{border-left-color:var(--am);background:var(--ac)}
+.res.am .vl{color:#6B5000}
+.res.am label{color:#6B5000}
+/* BOTÕES */
+.btn{width:100%;padding:12px;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;margin-top:7px;transition:opacity .15s}
+.btn:active{opacity:.85}
+.btn-v{background:var(--v);color:#fff}
+.btn-am{background:var(--am);color:var(--tx)}
+.btn-rd{background:var(--rd);color:#fff}
+.btn-cz{background:#EEE;color:#444}
+.btn-vm{background:var(--vm);color:#fff}
+.btn-sm{font-size:12px;padding:9px}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:7px}
+/* CHIPS/FILTROS */
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:11px}
+.chip{border:1.5px solid var(--vm);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:600;color:var(--vm);background:#fff;cursor:pointer;white-space:nowrap;transition:all .15s}
+.chip.on,.chip:active{background:var(--vm);color:#fff}
+.chip.am{border-color:var(--am);color:#6B5000}
+.chip.am.on{background:var(--am);color:var(--tx)}
+/* TABELA DE COMBINAÇÕES */
+.tab-combo{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px}
+.tab-combo th{background:var(--v);color:#fff;padding:7px 5px;text-align:center;font-size:11px}
+.tab-combo td{padding:7px 5px;text-align:center;border-bottom:1px solid #EEE}
+.tab-combo tr.ok2 td{background:#E8F5E9}
+.tab-combo tr.al td{background:#FFEBEE}
+.tab-combo tr.or td{background:#FFF3E0}
+.tab-combo tr:first-child td{font-weight:700}
+.badge{display:inline-block;padding:2px 7px;border-radius:20px;font-size:11px;font-weight:700}
+.badge-ok{background:#C8E6C9;color:#1B5E20}
+.badge-al{background:#FFCDD2;color:#B71C1C}
+.badge-or{background:#FFE0B2;color:#BF360C}
+/* BUSCA */
+.busca-w{position:relative;margin-bottom:11px}
+.busca-w input{padding-left:34px}
+.busca-w .ic{position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:15px}
+/* MÁQUINA CARD */
+.maq{background:#fff;border-radius:9px;padding:11px;margin-bottom:7px;box-shadow:0 1px 4px rgba(0,0,0,.08);border-left:4px solid var(--vm);cursor:pointer}
+.maq:active{background:var(--vc)}
+.maq .fab{font-size:11px;color:var(--vm);font-weight:700}
+.maq .mod{font-size:14px;font-weight:700;margin:2px 0}
+.maq .inf{font-size:11px;color:#666;display:flex;gap:10px;flex-wrap:wrap}
+.maq .eng-info{font-size:10px;color:var(--v);margin-top:4px;background:var(--vc);border-radius:4px;padding:3px 7px;display:inline-block}
+/* HISTÓRICO */
+.hist-item{background:#fff;border-radius:9px;padding:11px;margin-bottom:7px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.hist-item .dt{font-size:11px;color:var(--vm);font-weight:600}
+.hist-item .nm{font-size:14px;font-weight:700;margin:2px 0}
+.hist-item .det{font-size:12px;color:#555}
+.vazio{text-align:center;padding:36px 20px;color:#999}
+.vazio .ic{font-size:36px;margin-bottom:7px}
+/* ENGRENAGENS DISPONÍVEIS */
+.eng-chip{display:inline-flex;align-items:center;justify-content:center;min-width:38px;height:38px;border-radius:8px;border:2px solid #DDD;font-size:13px;font-weight:700;margin:3px;cursor:pointer;background:#fff;color:var(--tx);transition:all .15s}
+.eng-chip.on{background:var(--v);border-color:var(--v);color:#fff}
+.eng-chips-wrap{display:flex;flex-wrap:wrap;margin:7px 0}
+/* RELATORIO */
+.rel-l{display:flex;border-bottom:1px solid #EEE;padding:7px 0}
+.rel-l label{flex:0 0 44%;font-size:12px;font-weight:600;color:var(--v)}
+.rel-l span{flex:1;font-size:13px}
+.assin{text-align:center;margin-top:18px;padding-top:14px;border-top:1.5px solid var(--v)}
+.assin strong{font-size:13px;color:var(--v)}
+.assin p{font-size:11px}
+/* TOAST */
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(70px);background:#333;color:#fff;padding:9px 18px;border-radius:18px;font-size:13px;z-index:999;transition:transform .3s;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.rodape{text-align:center;padding:18px 14px 28px;font-size:11px;color:#999}
+/* PRINT */
+@media print{.hdr,.btn,.btn-row,.busca-w,.chips{display:none!important}.screen{display:block!important}.card{box-shadow:none;border:1px solid #CCC}}
+/* CULTURA SELECT */
+.cult-sel{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:11px}
+.cult-btn{border:2px solid var(--vm);border-radius:8px;padding:8px 4px;font-size:11px;font-weight:600;color:var(--vm);background:#fff;cursor:pointer;text-align:center;transition:all .15s}
+.cult-btn.on{background:var(--vm);color:#fff}
+</style>
+</head>
+<body>
+<header class="hdr">
+  <button class="bkbtn" id="btnBack" onclick="voltar()">&#8592; Voltar</button>
+  <img src="logo.jpg" alt="VM" id="hLogo">
+  <div class="ti"><h1 id="hTit">VM AgroRegulagem PRO</h1><small id="hSub">VM Consultoria Agrícola</small></div>
+</header>
+<main>
+
+<!-- ══ DASHBOARD ══════════════════════════════════════════════ -->
+<div id="screen-dashboard" class="screen active">
+  <div class="dash-banner">
+    <img src="logo.jpg" alt="VM">
+    <div><h2>VM AgroRegulagem PRO</h2><p>Vagner Mateus — CFTA 02524164144</p><p style="font-size:10px;opacity:.7;margin-top:3px">Sidrolândia – MS</p></div>
+  </div>
+  <div class="grid">
+    <button class="modbtn am" onclick="ir('reg-soja')"><span class="ic">🌱</span><span class="lb">Regulagem de Soja</span></button>
+    <button class="modbtn am" onclick="ir('reg-milho')"><span class="ic">🌽</span><span class="lb">Regulagem de Milho</span></button>
+    <button class="modbtn" onclick="ir('outras')"><span class="ic">🌾</span><span class="lb">Outras Culturas</span></button>
+    <button class="modbtn dest" onclick="ir('combinacoes')"><span class="ic">⚙️</span><span class="lb">Combinações de Engrenagens</span></button>
+    <button class="modbtn" onclick="ir('calc-pop')"><span class="ic">🧮</span><span class="lb">Calculadora de População</span></button>
+    <button class="modbtn" onclick="ir('pulverizadores')"><span class="ic">💧</span><span class="lb">Pulverizadores</span></button>
+    <button class="modbtn" onclick="ir('distribuidores')"><span class="ic">🚜</span><span class="lb">Distribuidores</span></button>
+    <button class="modbtn" onclick="ir('banco-dados')"><span class="ic">📚</span><span class="lb">Banco de Dados</span></button>
+    <button class="modbtn" onclick="ir('relatorio')"><span class="ic">📋</span><span class="lb">Relatório de Campo</span></button>
+    <button class="modbtn" onclick="ir('historico')"><span class="ic">📈</span><span class="lb">Histórico</span></button>
+  </div>
+  <div class="rodape">VM AgroRegulagem PRO · Fase 2 · 2026</div>
+</div>
+
+<!-- ══ COMBINAÇÕES DE ENGRENAGENS ════════════════════════════ -->
+<div id="screen-combinacoes" class="screen">
+  <div class="card">
+    <div class="ctit or">1 · Calibração da Máquina</div>
+    <p style="font-size:12px;color:#555;margin-bottom:10px">Informe uma combinação conhecida e o resultado medido em campo para calibrar o sistema.</p>
+    <div class="row2">
+      <div class="campo"><label>Tipo de regulagem</label>
+        <select id="cal-tipo" onchange="renderCulturasCombo()">
+          <option value="semente">Sementes (sem/m)</option>
+          <option value="adubo">Adubo (kg/ha)</option>
+        </select>
+      </div>
+      <div class="campo"><label>Cultura</label>
+        <select id="cal-cultura" onchange="atualizarRefCombo()">
+          <option value="Soja">Soja</option>
+          <option value="Milho">Milho</option>
+          <option value="Algodão">Algodão</option>
+          <option value="Feijão">Feijão</option>
+          <option value="Trigo">Trigo</option>
+          <option value="Sorgo">Sorgo</option>
+          <option value="Girassol">Girassol</option>
+        </select>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="campo"><label>Motriz Z1 atual</label><input id="cal-z1" type="number" placeholder="Ex: 22" oninput="calcK()"></div>
+      <div class="campo"><label>Movida Z2 atual</label><input id="cal-z2" type="number" placeholder="Ex: 16" oninput="calcK()"></div>
+      <div class="campo"><label id="cal-res-label">Sementes/m medido</label><input id="cal-res" type="number" step="0.1" placeholder="Ex: 14.2" oninput="calcK()"></div>
+    </div>
+    <div class="row2">
+      <div class="campo"><label>Espaç. linhas (cm)</label><input id="cal-espac" type="number" placeholder="Ex: 45" oninput="calcK()"></div>
+      <div class="campo"><label>Dose desejada</label><input id="cal-meta" type="number" placeholder="Ex: 300000" oninput="calcK()"></div>
+    </div>
+    <div class="res am" id="cal-k-box" style="display:none">
+      <label>Constante da máquina (K)</label>
+      <div class="vl" id="cal-k-val">—</div>
+      <div class="un" id="cal-k-un">calculada com sucesso</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ctit vm">2 · Engrenagens Disponíveis</div>
+    <div class="campo">
+      <label>Marca (carrega kit padrão)</label>
+      <select id="combo-marca" onchange="carregarKitMarca()">
+        <option value="">— Selecionar marca —</option>
+        <option>John Deere</option>
+        <option>Massey Ferguson</option>
+        <option>Semeato</option>
+        <option>Stara</option>
+        <option>Tatu</option>
+        <option>Case IH</option>
+        <option>Kuhn</option>
+        <option>Vence Tudo</option>
+        <option>Baldan</option>
+        <option>Jumil</option>
+        <option>Padrão Universal</option>
+      </select>
+    </div>
+    <p style="font-size:11px;color:#777;margin-bottom:6px">Toque para selecionar/deselecionar engrenagens disponíveis:</p>
+    <div class="eng-chips-wrap" id="combo-chips"></div>
+    <button class="btn btn-cz btn-sm" onclick="selecionarTodasEngs()" style="margin-top:6px">Selecionar todas</button>
+  </div>
+
+  <button class="btn btn-vm" onclick="calcularCombinacoes()">⚙️ Calcular Combinações</button>
+
+  <div class="card" id="combo-resultado" style="display:none">
+    <div class="ctit">Combinações — melhores resultados</div>
+    <div id="combo-info" style="font-size:12px;color:#555;margin-bottom:8px"></div>
+    <div style="overflow-x:auto">
+      <table class="tab-combo" id="combo-tabela">
+        <thead><tr><th>Motriz Z1</th><th>Movida Z2</th><th>Relação</th><th>Resultado</th><th>Meta</th><th>Erro %</th></tr></thead>
+        <tbody id="combo-tbody"></tbody>
+      </table>
+    </div>
+    <p style="font-size:10px;color:#999;margin-top:8px">🟢 ≤5% · 🟡 5-10% · 🔴 >10% de diferença</p>
+  </div>
+</div>
+
+<!-- ══ REGULAGEM DE SOJA ══════════════════════════════════════ -->
+<div id="screen-reg-soja" class="screen">
+  <div class="card">
+    <div class="ctit">Dados da Operação</div>
+    <div class="campo"><label>Fazenda</label><input id="s-faz" type="text" placeholder="Nome da fazenda"></div>
+    <div class="campo"><label>Produtor</label><input id="s-prod" type="text" placeholder="Nome do produtor"></div>
+    <div class="row2">
+      <div class="campo"><label>Data</label><input id="s-data" type="date"></div>
+      <div class="campo"><label>Município</label><input id="s-mun" type="text" placeholder="Cidade-UF"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ctit vm">Plantadeira</div>
+    <div class="row2">
+      <div class="campo"><label>Fabricante</label><input id="s-fab" type="text" placeholder="Ex: John Deere"></div>
+      <div class="campo"><label>Modelo</label><input id="s-mod" type="text" placeholder="Ex: DB60"></div>
+    </div>
+    <div class="row2">
+      <div class="campo"><label>Nº Linhas</label><input id="s-lin" type="number" placeholder="Ex: 13"></div>
+      <div class="campo"><label>Espaç. (cm)</label><input id="s-esp" type="number" value="45" oninput="calcSoja()"></div>
+    </div>
+    <div class="campo"><label>Disco distribuidor</label><input id="s-disc" type="text" placeholder="Ex: CDD 34F"></div>
+  </div>
+  <div class="card">
+    <div class="ctit am">Regulagem</div>
+    <div class="row2">
+      <div class="campo"><label>Sem/m Desejado</label><input id="s-des" type="number" step="0.1" placeholder="Ex: 14" oninput="calcSoja()"></div>
+      <div class="campo"><label>Sem/m Obtido</label><input id="s-obt" type="number" step="0.1" placeholder="Ex: 13.5" oninput="calcSoja()"></div>
+    </div>
+    <div class="row2">
+      <div class="campo"><label>Motriz Z1</label><input id="s-z1" type="number" placeholder="Dentes" oninput="calcSoja()"></div>
+      <div class="campo"><label>Movida Z2</label><input id="s-z2" type="number" placeholder="Dentes" oninput="calcSoja()"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ctit">Resultado</div>
+    <div class="row2">
+      <div class="res" id="s-r-des"><label>Dose Desejada</label><div class="vl" id="s-v-des">—</div><div class="un">sem/ha</div></div>
+      <div class="res" id="s-r-obt"><label>Dose Obtida</label><div class="vl" id="s-v-obt">—</div><div class="un">sem/ha</div></div>
+    </div>
+    <div class="res" id="s-r-dif"><label>Diferença</label><div class="vl" id="s-v-dif">—</div><div class="un">% em relação ao desejado</div></div>
+    <div class="res am" id="s-r-sug"><label>Engrenagem Motriz Sugerida</label><div class="vl" id="s-v-sug">—</div><div class="un">dentes (Z1)</div></div>
+  </div>
+  <button class="btn btn-vm" onclick="irCombinacoesDe('soja')">⚙️ Ver combinações — Semente</button>
+
+  <!-- ADUBAÇÃO -->
+  <div class="card">
+    <div class="ctit or">Regulagem de Adubação</div>
+    <div class="row2">
+      <div class="campo"><label>Dose desejada (kg/ha)</label><input id="sa-des" type="number" placeholder="Ex: 350" oninput="calcAdubSoja()"></div>
+      <div class="campo"><label>Nº linhas adubo</label><input id="sa-lin" type="number" placeholder="= linhas da plantadeira"></div>
+    </div>
+    <div class="row2">
+      <div class="campo"><label>Motriz Z1 (adubo)</label><input id="sa-z1" type="number" placeholder="Dentes" oninput="calcAdubSoja()"></div>
+      <div class="campo"><label>Movida Z2 (adubo)</label><input id="sa-z2" type="number" placeholder="Dentes" oninput="calcAdubSoja()"></div>
+    </div>
+    <div style="background:var(--vc);border-radius:8px;padding:10px;margin-top:4px">
+      <p style="font-size:11px;font-weight:600;color:var(--v);margin-bottom:8px">📐 Pesagem de campo</p>
+      <div class="row2">
+        <div class="campo"><label>Distância de coleta (m)</label><input id="sa-dist" type="number" placeholder="Ex: 50" oninput="calcAdubSoja()"></div>
+        <div class="campo"><label>Peso coletado (kg)</label><input id="sa-peso" type="number" step="0.01" placeholder="Pesagem real" oninput="calcAdubSoja()"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="sa-card-res">
+    <div class="ctit or">Resultado — Adubação</div>
+    <div class="row2">
+      <div class="res ok2" id="sa-r-des"><label>Dose Desejada</label><div class="vl" id="sa-v-des">—</div><div class="un">kg/ha</div></div>
+      <div class="res" id="sa-r-obt"><label>Dose Obtida</label><div class="vl" id="sa-v-obt">—</div><div class="un">kg/ha</div></div>
+    </div>
+    <div class="res" id="sa-r-dif"><label>Diferença</label><div class="vl" id="sa-v-dif">—</div><div class="un">% em relação ao desejado</div></div>
+    <div class="res am"><label>Engrenagem Motriz Sugerida (adubo)</label><div class="vl" id="sa-v-sug">—</div><div class="un">dentes (Z1) para atingir dose desejada</div></div>
+  </div>
+
+  <button class="btn btn-vm" style="background:var(--or)" onclick="irCombinacoesDe('adubo-soja')">⚙️ Ver combinações — Adubação</button>
+  <button class="btn btn-v" onclick="salvarSoja()">💾 Salvar no Histórico</button>
+  <button class="btn btn-am" onclick="gerarRelSoja()">📋 Gerar Relatório</button>
+  <button class="btn btn-cz" onclick="limparSoja()">🗑️ Limpar</button>
+</div>
+
+<!-- ══ REGULAGEM DE MILHO ═════════════════════════════════════ -->
+<div id="screen-reg-milho" class="screen">
+  <div class="card">
+    <div class="ctit">Dados da Operação</div>
+    <div class="campo"><label>Fazenda</label><input id="m-faz" type="text"></div>
+    <div class="campo"><label>Produtor</label><input id="m-prod" type="text"></div>
+    <div class="row2">
+      <div class="campo"><label>Data</label><input id="m-data" type="date"></div>
+      <div class="campo"><label>Município</label><input id="m-mun" type="text"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ctit vm">Plantadeira</div>
+    <div class="row2">
+      <div class="campo"><label>Fabricante</label><input id="m-fab" type="text"></div>
+      <div class="campo"><label>Modelo</label><input id="m-mod" type="text"></div>
+    </div>
+    <div class="row2">
+      <div class="campo"><label>Espaç. (cm)</label><input id="m-esp" type="number" value="70" oninput="calcMilho()"></div>
+      <div class="campo"><label>Sem/m Desejado</label><input id="m-des" type="number" step="0.1" placeholder="Ex: 4.5" oninput="calcMilho()"></div>
+    </div>
+    <div class="row2">
+      <div class="campo"><label>Sem/m Obtido</label><input id="m-obt" type="number" step="0.1" oninput="calcMilho()"></div>
+      <div class="campo"><label>Germinação (%)</label><input id="m-ger" type="number" value="92" oninput="calcMilho()"></div>
+    </div>
+    <div class="row2">
+      <div class="campo"><label>Motriz Z1</label><input id="m-z1" type="number" oninput="calcMilho()"></div>
+      <div class="campo"><label>Movida Z2</label><input id="m-z2" type="number" oninput="calcMilho()"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ctit">Resultado</div>
+    <div class="row2">
+      <div class="res" id="m-r-des"><label>Plantas/ha Desejado</label><div class="vl" id="m-v-des">—</div><div class="un">pl/ha</div></div>
+      <div class="res" id="m-r-obt"><label>Plantas/ha Estimado</label><div class="vl" id="m-v-obt">—</div><div class="un">pl/ha</div></div>
+    </div>
+    <div class="res" id="m-r-dif"><label>Diferença</label><div class="vl" id="m-v-dif">—</div><div class="un">%</div></div>
+    <div class="res am"><label>Engrenagem Sugerida (Z1)</label><div class="vl" id="m-v-sug">—</div><div class="un">dentes</div></div>
+  </div>
+  <button class="btn btn-vm" onclick="irCombinacoesDe('milho')">⚙️ Ver combinações possíveis</button>
+  <button class="btn btn-v" onclick="salvarMilho()">💾 Salvar no Histórico</button>
+</div>
+
+<!-- ══ OUTRAS CULTURAS ════════════════════════════════════════ -->
+<div id="screen-outras" class="screen">
+  <div class="card">
+    <div class="ctit">Selecionar Cultura</div>
+    <div class="cult-sel">
+      <button class="cult-btn on" id="cb-Algodão" onclick="selecionarCultura('Algodão')">🌿 Algodão</button>
+      <button class="cult-btn" id="cb-Feijão"  onclick="selecionarCultura('Feijão')">🫘 Feijão</button>
+      <button class="cult-btn" id="cb-Trigo"   onclick="selecionarCultura('Trigo')">🌾 Trigo</button>
+      <button class="cult-btn" id="cb-Sorgo"   onclick="selecionarCultura('Sorgo')">🌱 Sorgo</button>
+      <button class="cult-btn" id="cb-Girassol"onclick="selecionarCultura('Girassol')">🌻 Girassol</button>
+      <button class="cult-btn" id="cb-Aveia"   onclick="selecionarCultura('Aveia')">🌿 Aveia</button>
+    </div>
+    <div class="res am" id="cult-ref">
+      <label id="cult-ref-label">Referência</label>
+      <div class="vl" id="cult-ref-pop">—</div>
+      <div class="un" id="cult-ref-esp">—</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ctit">Dados da Operação</div>
+    <div class="campo"><label>Fazenda</label><input id="o-faz" type="text"></div>
+    <div class="campo"><label>Produtor</label><input id="o-prod" type="text"></div>
+    <div class="row2">
+      <div class="campo"><label>Data</label><input id="o-data" type="date"></div>
+      <div class="campo"><label>Município</label><input id="o-mun" type="text"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ctit vm">Plantadeira / Semeadora</div>
+    <div class="row2">
+      <div class="campo"><label>Fabricante</label><input id="o-fab" type="text"></div>
+      <div class="campo"><label>Modelo</label><input id="o-mod" type="text"></div>
+    </div>
+    <div class="row2">
+      <div class="campo"><label>Espaç. (cm)</label><input id="o-esp" type="number" oninput="calcOutras()"></div>
+      <div class="campo"><label>Sem/m Desejado</label><input id="o-des" type="number" step="0.1" oninput="calcOutras()"></div>
+    </div>
+    <div class="row2">
+      <div class="campo"><label>Sem/m Obtido</label><input id="o-obt" type="number" step="0.1" oninput="calcOutras()"></div>
+      <div class="campo"><label>Germinação (%)</label><input id="o-ger" type="number" value="85" oninput="calcOutras()"></div>
+    </div>
+    <div class="row2">
+      <div class="campo"><label>Motriz Z1</label><input id="o-z1" type="number" oninput="calcOutras()"></div>
+      <div class="campo"><label>Movida Z2</label><input id="o-z2" type="number" oninput="calcOutras()"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ctit">Resultado</div>
+    <div class="row2">
+      <div class="res" id="o-r-des"><label>Dose Desejada</label><div class="vl" id="o-v-des">—</div><div class="un">sem/ha</div></div>
+      <div class="res" id="o-r-obt"><label>Dose Obtida</label><div class="vl" id="o-v-obt">—</div><div class="un">sem/ha</div></div>
+    </div>
+    <div class="res" id="o-r-dif"><label>Diferença</label><div class="vl" id="o-v-dif">—</div><div class="un">%</div></div>
+    <div class="res" id="o-r-pl"><label>Plantas/ha estimado</label><div class="vl" id="o-v-pl">—</div><div class="un">pl/ha</div></div>
+    <div class="res am"><label>Engrenagem Motriz Sugerida</label><div class="vl" id="o-v-sug">—</div><div class="un">dentes (Z1)</div></div>
+  </div>
+  <button class="btn btn-vm" onclick="irCombinacoesDe('outras')">⚙️ Ver combinações possíveis</button>
+  <button class="btn btn-v" onclick="salvarOutras()">💾 Salvar no Histórico</button>
+</div>
+
+<!-- ══ CALCULADORA DE POPULAÇÃO ══════════════════════════════ -->
+<div id="screen-calc-pop" class="screen">
+  <div class="card">
+    <div class="ctit">Parâmetros</div>
+    <div class="campo"><label>Espaçamento entre linhas (cm)</label><input id="p-esp" type="number" placeholder="Ex: 45" oninput="calcPop()"></div>
+    <div class="campo"><label>Sementes por metro linear</label><input id="p-sem" type="number" step="0.1" placeholder="Ex: 14" oninput="calcPop()"></div>
+    <div class="campo"><label>Germinação esperada (%)</label><input id="p-ger" type="number" value="90" oninput="calcPop()"></div>
+  </div>
+  <div class="card">
+    <div class="ctit am">Resultado</div>
+    <div class="res"><label>Sementes por hectare</label><div class="vl" id="p-v-sem">—</div><div class="un">sem/ha</div></div>
+    <div class="res" id="p-r-pl"><label>Plantas por hectare</label><div class="vl" id="p-v-pl">—</div><div class="un">pl/ha (com germinação)</div></div>
+    <div class="res" id="p-r-st"><label>Status</label><div class="vl" id="p-v-st">—</div><div class="un" id="p-v-un">—</div></div>
+  </div>
+  <div class="card">
+    <div class="ctit vm">Referência por Cultura</div>
+    <table style="width:100%;font-size:12px;border-collapse:collapse">
+      <tr style="background:var(--vc)"><th style="padding:7px;text-align:left">Cultura</th><th style="padding:7px;text-align:right">Mín</th><th style="padding:7px;text-align:right">Máx</th><th style="padding:7px;text-align:right">Esp. (cm)</th></tr>
+      <tr><td style="padding:7px">Soja</td><td style="padding:7px;text-align:right">200.000</td><td style="padding:7px;text-align:right">340.000</td><td style="padding:7px;text-align:right">45</td></tr>
+      <tr style="background:var(--cz)"><td style="padding:7px">Milho safra</td><td style="padding:7px;text-align:right">55.000</td><td style="padding:7px;text-align:right">80.000</td><td style="padding:7px;text-align:right">70</td></tr>
+      <tr><td style="padding:7px">Milho safrinha</td><td style="padding:7px;text-align:right">50.000</td><td style="padding:7px;text-align:right">65.000</td><td style="padding:7px;text-align:right">70</td></tr>
+      <tr style="background:var(--cz)"><td style="padding:7px">Algodão</td><td style="padding:7px;text-align:right">80.000</td><td style="padding:7px;text-align:right">120.000</td><td style="padding:7px;text-align:right">90</td></tr>
+      <tr><td style="padding:7px">Feijão</td><td style="padding:7px;text-align:right">180.000</td><td style="padding:7px;text-align:right">250.000</td><td style="padding:7px;text-align:right">45</td></tr>
+      <tr style="background:var(--cz)"><td style="padding:7px">Trigo</td><td style="padding:7px;text-align:right">250.000</td><td style="padding:7px;text-align:right">400.000</td><td style="padding:7px;text-align:right">20</td></tr>
+      <tr><td style="padding:7px">Sorgo</td><td style="padding:7px;text-align:right">100.000</td><td style="padding:7px;text-align:right">200.000</td><td style="padding:7px;text-align:right">70</td></tr>
+      <tr style="background:var(--cz)"><td style="padding:7px">Girassol</td><td style="padding:7px;text-align:right">35.000</td><td style="padding:7px;text-align:right">55.000</td><td style="padding:7px;text-align:right">90</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ══ PULVERIZADORES ════════════════════════════════════════ -->
+<div id="screen-pulverizadores" class="screen">
+  <div class="card">
+    <div class="ctit">Dados do Pulverizador</div>
+    <div class="row2"><div class="campo"><label>Fabricante</label><input id="pv-fab" type="text"></div><div class="campo"><label>Modelo</label><input id="pv-mod" type="text"></div></div>
+    <div class="row2"><div class="campo"><label>Largura barra (m)</label><input id="pv-bar" type="number" step="0.5" oninput="calcPulv()"></div><div class="campo"><label>Espaç. bicos (cm)</label><input id="pv-esp" type="number" value="50" oninput="calcPulv()"></div></div>
+    <div class="row2"><div class="campo"><label>Velocidade (km/h)</label><input id="pv-vel" type="number" step="0.5" oninput="calcPulv()"></div><div class="campo"><label>Vazão bico (L/min)</label><input id="pv-vaz" type="number" step="0.01" placeholder="Ex: 0.79" oninput="calcPulv()"></div></div>
+    <div class="campo"><label>Dose desejada (L/ha)</label><input id="pv-dose" type="number" oninput="calcPulv()"></div>
+  </div>
+  <div class="card">
+    <div class="ctit am">Resultado</div>
+    <div class="res"><label>Volume aplicado (L/ha)</label><div class="vl" id="pv-v-vol">—</div><div class="un">calculado</div></div>
+    <div class="res" id="pv-r-dif"><label>Diferença da dose</label><div class="vl" id="pv-v-dif">—</div><div class="un">%</div></div>
+  </div>
+</div>
+
+<!-- ══ DISTRIBUIDORES ════════════════════════════════════════ -->
+<div id="screen-distribuidores" class="screen">
+  <div class="card">
+    <div class="ctit">Dados da Regulagem de Adubo</div>
+    <div class="row2"><div class="campo"><label>Fabricante</label><input id="d-fab" type="text"></div><div class="campo"><label>Modelo</label><input id="d-mod" type="text"></div></div>
+    <div class="row2"><div class="campo"><label>Largura trab. (m)</label><input id="d-lar" type="number" step="0.5" oninput="calcDist()"></div><div class="campo"><label>Velocidade (km/h)</label><input id="d-vel" type="number" step="0.5" oninput="calcDist()"></div></div>
+    <div class="row2"><div class="campo"><label>Dose desejada (kg/ha)</label><input id="d-dose" type="number" oninput="calcDist()"></div><div class="campo"><label>Peso coletado 30s (kg)</label><input id="d-peso" type="number" step="0.01" oninput="calcDist()"></div></div>
+    <div class="row2"><div class="campo"><label>Motriz Z1</label><input id="d-z1" type="number" oninput="calcDist()"></div><div class="campo"><label>Movida Z2</label><input id="d-z2" type="number" oninput="calcDist()"></div></div>
+  </div>
+  <div class="card">
+    <div class="ctit am">Resultado</div>
+    <div class="res"><label>Peso teórico em 30s</label><div class="vl" id="d-v-teo">—</div><div class="un">kg</div></div>
+    <div class="res" id="d-r-st"><label>Situação da regulagem</label><div class="vl" id="d-v-st">—</div><div class="un">tolerância: ±5%</div></div>
+    <div class="res am"><label>Engrenagem Motriz Sugerida</label><div class="vl" id="d-v-sug">—</div><div class="un">dentes (Z1) para atingir dose</div></div>
+  </div>
+  <button class="btn btn-vm" onclick="irCombinacoesDe('adubo')">⚙️ Ver combinações possíveis (adubo)</button>
+</div>
+
+<!-- ══ BANCO DE DADOS ════════════════════════════════════════ -->
+<div id="screen-banco-dados" class="screen">
+  <div class="busca-w"><span class="ic">🔍</span><input id="bd-busca" type="text" placeholder="Buscar fabricante ou modelo..." oninput="filtrarBD()"></div>
+  <div class="chips" id="bd-chips"></div>
+  <div id="bd-lista"></div>
+</div>
+
+<!-- ══ RELATÓRIO ═════════════════════════════════════════════ -->
+<div id="screen-relatorio" class="screen">
+  <div class="card">
+    <div class="ctit">Ficha de Regulagem — VM Consultoria Agrícola</div>
+    <div class="rel-l"><label>Fazenda:</label><span id="rl-faz">—</span></div>
+    <div class="rel-l"><label>Produtor:</label><span id="rl-prod">—</span></div>
+    <div class="rel-l"><label>Data:</label><span id="rl-data">—</span></div>
+    <div class="rel-l"><label>Município:</label><span id="rl-mun">—</span></div>
+    <div class="rel-l"><label>Cultura:</label><span id="rl-cult">Soja</span></div>
+    <div class="rel-l"><label>Máquina:</label><span id="rl-maq">—</span></div>
+    <div class="rel-l"><label>Espaçamento:</label><span id="rl-esp">—</span></div>
+    <div class="rel-l"><label>Disco:</label><span id="rl-disc">—</span></div>
+    <div class="rel-l"><label>Eng. Motriz Z1:</label><span id="rl-z1">—</span></div>
+    <div class="rel-l"><label>Eng. Movida Z2:</label><span id="rl-z2">—</span></div>
+    <div class="rel-l"><label>Dose desejada:</label><span id="rl-des">—</span></div>
+    <div class="rel-l"><label>Dose obtida:</label><span id="rl-obt">—</span></div>
+    <div class="rel-l"><label>Diferença:</label><span id="rl-dif">—</span></div>
+    <div class="rel-l"><label>Z1 sugerida:</label><span id="rl-sug">—</span></div>
+    <div class="assin">
+      <div style="border-top:1.5px solid var(--v);margin:18px auto 8px;width:200px"></div>
+      <strong>Vagner Mateus Bernardo Vanin</strong>
+      <p>Técnico Agrícola — CFTA 02524164144</p>
+      <p>Sidrolândia – MS</p>
+    </div>
+  </div>
+  <button class="btn btn-v" onclick="window.print()">🖨️ Imprimir / PDF</button>
+  <button class="btn btn-am" onclick="ir('reg-soja')">✏️ Editar</button>
+</div>
+
+<!-- ══ HISTÓRICO ══════════════════════════════════════════════ -->
+<div id="screen-historico" class="screen">
+  <div id="hist-lista"></div>
+  <button class="btn btn-rd" onclick="limparHist()" style="margin-top:8px">🗑️ Limpar Histórico</button>
+</div>
+
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// DADOS
+// ═══════════════════════════════════════════════════════════════
+const CULTURAS_REF = {
+  Soja:     {popMin:200000,popMax:340000,popPad:300000,espPad:45,un:'sem/ha'},
+  Milho:    {popMin:55000, popMax:80000, popPad:65000, espPad:70,un:'pl/ha'},
+  Algodão:  {popMin:80000, popMax:120000,popPad:100000,espPad:90,un:'sem/ha'},
+  Feijão:   {popMin:180000,popMax:250000,popPad:220000,espPad:45,un:'sem/ha'},
+  Trigo:    {popMin:250000,popMax:400000,popPad:330000,espPad:20,un:'sem/ha'},
+  Sorgo:    {popMin:100000,popMax:200000,popPad:150000,espPad:70,un:'sem/ha'},
+  Girassol: {popMin:35000, popMax:55000, popPad:45000, espPad:90,un:'sem/ha'},
+  Aveia:    {popMin:300000,popMax:500000,popPad:400000,espPad:17,un:'sem/ha'},
+};
+
+const KITS_ENGRENAGENS = {
+  'John Deere':        [10,12,14,16,18,20,22,24,26,28,30,32,34],
+  'Massey Ferguson':   [10,12,14,16,18,20,22,24,26,28,30,32],
+  'Semeato':           [12,14,16,18,20,22,24,26,28,30,32],
+  'Stara':             [10,12,14,16,18,20,22,24,26,28,30],
+  'Tatu':              [10,12,14,16,18,20,22,24,26,28,30],
+  'Case IH':           [10,12,14,16,18,20,22,24,26,28,30,32,34],
+  'Kuhn':              [10,12,14,16,18,20,22,24,26,28,30],
+  'Vence Tudo':        [10,12,14,16,18,20,22,24,26,28,30],
+  'Baldan':            [10,12,14,16,18,20,22,24,26,28],
+  'Jumil':             [10,12,14,16,18,20,22,24,26,28,30],
+  'Padrão Universal':  [10,12,14,16,18,20,22,24,26,28,30,32],
+};
+
+const BD = [
+  // JOHN DEERE
+  {fab:'John Deere',mod:'DB60',lin:24,esp:45,tipo:'Disco duplo',disco:'CDD 34F',cult:'Soja',kit:'John Deere'},
+  {fab:'John Deere',mod:'1113',lin:13,esp:45,tipo:'Disco duplo',disco:'CDD 34F',cult:'Soja',kit:'John Deere'},
+  {fab:'John Deere',mod:'455',lin:13,esp:45,tipo:'Disco duplo',disco:'CDD 34F',cult:'Soja',kit:'John Deere'},
+  {fab:'John Deere',mod:'7200',lin:12,esp:76,tipo:'Disco duplo',disco:'JD Plate',cult:'Milho',kit:'John Deere'},
+  {fab:'John Deere',mod:'7300',lin:8, esp:76,tipo:'Disco duplo',disco:'JD Plate',cult:'Milho',kit:'John Deere'},
+  {fab:'John Deere',mod:'7000',lin:8, esp:90,tipo:'Disco duplo',disco:'JD Plate',cult:'Milho',kit:'John Deere'},
+  {fab:'John Deere',mod:'750',lin:15,esp:19,tipo:'Disco simples',disco:'Drill',cult:'Trigo',kit:'John Deere'},
+  {fab:'John Deere',mod:'1590',lin:19,esp:20,tipo:'Disco simples',disco:'Drill',cult:'Trigo',kit:'John Deere'},
+  // MASSEY FERGUSON
+  {fab:'Massey Ferguson',mod:'8200',lin:17,esp:45,tipo:'Disco duplo',disco:'Vindex',cult:'Soja',kit:'Massey Ferguson'},
+  {fab:'Massey Ferguson',mod:'8300',lin:13,esp:45,tipo:'Disco duplo',disco:'Vindex',cult:'Soja',kit:'Massey Ferguson'},
+  {fab:'Massey Ferguson',mod:'8500',lin:17,esp:45,tipo:'Disco duplo',disco:'Vindex',cult:'Soja',kit:'Massey Ferguson'},
+  {fab:'Massey Ferguson',mod:'8700',lin:21,esp:45,tipo:'Disco duplo',disco:'Vindex',cult:'Soja',kit:'Massey Ferguson'},
+  {fab:'Massey Ferguson',mod:'5660',lin:9, esp:76,tipo:'Disco duplo',disco:'MF',cult:'Milho',kit:'Massey Ferguson'},
+  {fab:'Massey Ferguson',mod:'8100',lin:13,esp:45,tipo:'Disco duplo',disco:'Vindex',cult:'Soja',kit:'Massey Ferguson'},
+  // SEMEATO
+  {fab:'Semeato',mod:'SHM 1517',lin:15,esp:45,tipo:'Disco duplo',disco:'SHM',cult:'Soja',kit:'Semeato'},
+  {fab:'Semeato',mod:'TDNG 420',lin:17,esp:45,tipo:'Disco triplo',disco:'TDNG',cult:'Soja',kit:'Semeato'},
+  {fab:'Semeato',mod:'TDNG 380',lin:15,esp:45,tipo:'Disco triplo',disco:'TDNG',cult:'Soja',kit:'Semeato'},
+  {fab:'Semeato',mod:'SOJ 480', lin:17,esp:45,tipo:'Disco duplo',disco:'SOJ',cult:'Soja',kit:'Semeato'},
+  {fab:'Semeato',mod:'Personale III',lin:11,esp:45,tipo:'Disco duplo',disco:'Semeato',cult:'Soja',kit:'Semeato'},
+  {fab:'Semeato',mod:'PST 5',lin:5,esp:17,tipo:'Disco simples',disco:'PST',cult:'Trigo',kit:'Semeato'},
+  {fab:'Semeato',mod:'PST 7',lin:7,esp:17,tipo:'Disco simples',disco:'PST',cult:'Trigo',kit:'Semeato'},
+  // STARA
+  {fab:'Stara',mod:'Estrela 32',lin:16,esp:45,tipo:'Disco duplo',disco:'Stara',cult:'Soja',kit:'Stara'},
+  {fab:'Stara',mod:'Iris 12000',lin:15,esp:45,tipo:'Disco duplo',disco:'Stara',cult:'Soja',kit:'Stara'},
+  {fab:'Stara',mod:'Vega 8500', lin:11,esp:45,tipo:'Disco duplo',disco:'Stara',cult:'Soja',kit:'Stara'},
+  {fab:'Stara',mod:'Mykonos 8500',lin:8,esp:90,tipo:'Disco duplo',disco:'Stara',cult:'Milho',kit:'Stara'},
+  {fab:'Stara',mod:'Maia 6500', lin:9,esp:45,tipo:'Disco duplo',disco:'Stara',cult:'Soja',kit:'Stara'},
+  // TATU
+  {fab:'Tatu',mod:'Soja Air Plus',lin:16,esp:45,tipo:'Pneumático',disco:'Tatu',cult:'Soja',kit:'Tatu'},
+  {fab:'Tatu',mod:'Fênix PD',   lin:13,esp:45,tipo:'Disco duplo',disco:'Tatu FD',cult:'Soja',kit:'Tatu'},
+  {fab:'Tatu',mod:'Platinum PD',lin:15,esp:45,tipo:'Disco duplo',disco:'Tatu',cult:'Soja',kit:'Tatu'},
+  {fab:'Tatu',mod:'Imara 6100', lin:9, esp:90,tipo:'Disco duplo',disco:'Tatu',cult:'Milho',kit:'Tatu'},
+  {fab:'Tatu',mod:'ATM 10',     lin:10,esp:20,tipo:'Disco simples',disco:'Tatu',cult:'Trigo',kit:'Tatu'},
+  // CASE IH
+  {fab:'Case IH',mod:'Early Riser 900',lin:16,esp:45,tipo:'Disco duplo',disco:'CDD',cult:'Soja',kit:'Case IH'},
+  {fab:'Case IH',mod:'Early Riser 955',lin:24,esp:38,tipo:'Disco duplo',disco:'CDD Kinze',cult:'Soja',kit:'Case IH'},
+  {fab:'Case IH',mod:'1200 Flex',lin:8,esp:76,tipo:'Disco duplo',disco:'Case',cult:'Milho',kit:'Case IH'},
+  {fab:'Case IH',mod:'SDX 30',  lin:25,esp:20,tipo:'Disco simples',disco:'Case',cult:'Trigo',kit:'Case IH'},
+  // KUHN
+  {fab:'Kuhn',mod:'Maxima 2',   lin:12,esp:45,tipo:'Disco duplo',disco:'Precision',cult:'Soja',kit:'Kuhn'},
+  {fab:'Kuhn',mod:'Maxima 3',   lin:16,esp:45,tipo:'Disco duplo',disco:'Precision',cult:'Soja',kit:'Kuhn'},
+  {fab:'Kuhn',mod:'Maxima 3 Ti',lin:19,esp:45,tipo:'Disco duplo',disco:'Precision',cult:'Soja',kit:'Kuhn'},
+  // VENCE TUDO
+  {fab:'Vence Tudo',mod:'VT 6500',lin:13,esp:45,tipo:'Disco duplo',disco:'VT',cult:'Soja',kit:'Vence Tudo'},
+  {fab:'Vence Tudo',mod:'AVS 7300',lin:15,esp:45,tipo:'Disco duplo',disco:'VT',cult:'Soja',kit:'Vence Tudo'},
+  {fab:'Vence Tudo',mod:'ZM 9700',lin:17,esp:45,tipo:'Disco duplo',disco:'VT',cult:'Soja',kit:'Vence Tudo'},
+  // BALDAN
+  {fab:'Baldan',mod:'BDPL 7700',lin:17,esp:45,tipo:'Disco duplo',disco:'Baldan',cult:'Soja',kit:'Baldan'},
+  {fab:'Baldan',mod:'PST 8',    lin:8, esp:70,tipo:'Disco duplo',disco:'Baldan',cult:'Milho',kit:'Baldan'},
+  {fab:'Baldan',mod:'DRILL 400',lin:17,esp:20,tipo:'Disco simples',disco:'Baldan',cult:'Trigo',kit:'Baldan'},
+  // JUMIL
+  {fab:'Jumil',mod:'JM 3050 PD',lin:9, esp:45,tipo:'Disco duplo',disco:'Jumil',cult:'Soja',kit:'Jumil'},
+  {fab:'Jumil',mod:'JM 3080 Air',lin:11,esp:45,tipo:'Pneumático',disco:'Jumil',cult:'Soja',kit:'Jumil'},
+  {fab:'Jumil',mod:'JM 3130',   lin:13,esp:45,tipo:'Disco duplo',disco:'Jumil',cult:'Soja',kit:'Jumil'},
+];
+
+// ═══════════════════════════════════════════════════════════════
+// NAVEGAÇÃO
+// ═══════════════════════════════════════════════════════════════
+const TITULOS = {
+  dashboard:      ['VM AgroRegulagem PRO','VM Consultoria Agrícola'],
+  'reg-soja':     ['Regulagem de Soja','Plantadeira — Safra 26/27'],
+  'reg-milho':    ['Regulagem de Milho','Plantadeira — Safra 26/27'],
+  outras:         ['Outras Culturas','Algodão · Feijão · Trigo · Sorgo'],
+  combinacoes:    ['Combinações de Engrenagens','Simulador universal'],
+  'calc-pop':     ['Calculadora de População','Plantas por hectare'],
+  pulverizadores: ['Regulagem de Pulverizadores','Barra e autopropelido'],
+  distribuidores: ['Distribuidores de Fertilizantes','Adubação linha e lanço'],
+  'banco-dados':  ['Banco de Dados','Fabricantes e Modelos'],
+  relatorio:      ['Relatório de Campo','Para entrega ao produtor'],
+  historico:      ['Histórico de Regulagens','Registros salvos'],
+};
+
+let telaAtual = 'dashboard';
+let culturaSelecionada = 'Algodão';
+let engsSelecionadas = new Set([10,12,14,16,18,20,22,24,26,28,30]);
+
+function ir(tela) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + tela).classList.add('active');
+  telaAtual = tela;
+  const t = TITULOS[tela] || ['VM AgroRegulagem PRO',''];
+  document.getElementById('hTit').textContent = t[0];
+  document.getElementById('hSub').textContent = t[1];
+  const bb = document.getElementById('btnBack');
+  const lg = document.getElementById('hLogo');
+  if (tela === 'dashboard') { bb.classList.remove('on'); lg.style.display=''; }
+  else { bb.classList.add('on'); lg.style.display='none'; }
+  if (tela === 'banco-dados') { renderChipsMarca(); renderBD(BD); }
+  if (tela === 'historico') renderHistorico();
+  if (tela === 'combinacoes') renderChipsEngs(Array.from(engsSelecionadas));
+  window.scrollTo(0,0);
+}
+function voltar() { ir('dashboard'); }
+
+// ═══════════════════════════════════════════════════════════════
+// COMBINAÇÕES DE ENGRENAGENS
+// ═══════════════════════════════════════════════════════════════
+function carregarKitMarca() {
+  const marca = document.getElementById('combo-marca').value;
+  const kit = KITS_ENGRENAGENS[marca] || [10,12,14,16,18,20,22,24,26,28,30];
+  engsSelecionadas = new Set(kit);
+  renderChipsEngs(kit);
+}
+
+function renderChipsEngs(todas) {
+  const todos = [...new Set([...todas, 10,12,14,16,18,20,22,24,26,28,30,32,34])].sort((a,b)=>a-b);
+  const wrap = document.getElementById('combo-chips');
+  wrap.innerHTML = todos.map(n => `
+    <div class="eng-chip ${engsSelecionadas.has(n)?'on':''}" onclick="toggleEng(${n},this)">${n}</div>
+  `).join('');
+}
+
+function toggleEng(n, el) {
+  if (engsSelecionadas.has(n)) { engsSelecionadas.delete(n); el.classList.remove('on'); }
+  else { engsSelecionadas.add(n); el.classList.add('on'); }
+}
+
+function selecionarTodasEngs() {
+  document.querySelectorAll('.eng-chip').forEach(el => {
+    el.classList.add('on');
+    engsSelecionadas.add(parseInt(el.textContent));
+  });
+}
+
+function calcK() {
+  const z1  = parseFloat(document.getElementById('cal-z1').value);
+  const z2  = parseFloat(document.getElementById('cal-z2').value);
+  const res = parseFloat(document.getElementById('cal-res').value);
+  if (!z1 || !z2 || !res) { document.getElementById('cal-k-box').style.display='none'; return; }
+  const tipo = document.getElementById('cal-tipo').value;
+  let K, un;
+  if (tipo === 'semente') {
+    K = res * (z2 / z1);
+    un = 'sem/m por relação unitária';
+  } else {
+    const espac = parseFloat(document.getElementById('cal-espac').value) || 45;
+    const semPorM = res * (espac/100) / 10000;
+    K = semPorM * (z2/z1);
+    un = 'kg/ha por relação unitária';
+  }
+  document.getElementById('cal-k-val').textContent = K.toFixed(4);
+  document.getElementById('cal-k-un').textContent = un;
+  document.getElementById('cal-k-box').style.display = 'block';
+}
+
+function calcularCombinacoes() {
+  const z1  = parseFloat(document.getElementById('cal-z1').value);
+  const z2  = parseFloat(document.getElementById('cal-z2').value);
+  const res = parseFloat(document.getElementById('cal-res').value);
+  const meta = parseFloat(document.getElementById('cal-meta').value);
+  const espac = parseFloat(document.getElementById('cal-espac').value);
+  const tipo  = document.getElementById('cal-tipo').value;
+  const cultura = document.getElementById('cal-cultura').value;
+
+  if (!z1||!z2||!res||!meta||!espac) { toast('Preencha todos os campos de calibração'); return; }
+  if (engsSelecionadas.size < 2) { toast('Selecione ao menos 2 engrenagens'); return; }
+
+  const K = tipo === 'semente'
+    ? res * (z2/z1)
+    : (res * (espac/100) / 10000) * (z2/z1);
+
+  const engs = Array.from(engsSelecionadas).sort((a,b)=>a-b);
+  const combos = [];
+
+  for (const za of engs) {
+    for (const zb of engs) {
+      if (za === zb) continue;
+      let resultado, label;
+      if (tipo === 'semente') {
+        const semPM = K * (za/zb);
+        resultado = semPM * 10000 / (espac/100);
+        label = fmt(Math.round(resultado)) + ' sem/ha';
+      } else {
+        resultado = K * (za/zb) * 10000 / (espac/100);
+        label = fmt(Math.round(resultado)) + ' kg/ha';
+      }
+      const erro = ((resultado - meta) / meta * 100);
+      combos.push({za, zb, rel:(za/zb).toFixed(3), resultado, label, erro});
+    }
+  }
+
+  combos.sort((a,b) => Math.abs(a.erro) - Math.abs(b.erro));
+  const top = combos.slice(0,25);
+
+  const metaLabel = tipo === 'semente'
+    ? fmt(Math.round(meta)) + ' sem/ha'
+    : fmt(Math.round(meta)) + ' kg/ha';
+
+  const cultRef = CULTURAS_REF[cultura];
+  document.getElementById('combo-info').innerHTML =
+    `<b>Meta:</b> ${metaLabel} · <b>Espaç:</b> ${espac}cm · <b>K:</b> ${K.toFixed(4)}<br>
+     <span style="color:var(--v)">Ref. ${cultura}: ${fmt(cultRef.popMin)} – ${fmt(cultRef.popMax)} ${cultRef.un}</span>`;
+
+  const tbody = document.getElementById('combo-tbody');
+  tbody.innerHTML = top.map((c,i) => {
+    const cls = Math.abs(c.erro)<=5 ? 'ok2' : Math.abs(c.erro)<=10 ? 'or' : 'al';
+    const erroStr = (c.erro>0?'+':'')+c.erro.toFixed(1)+'%';
+    return `<tr class="${cls}">
+      <td>${c.za}</td><td>${c.zb}</td><td>${c.rel}</td>
+      <td>${c.label}</td><td>${metaLabel}</td>
+      <td><span class="badge badge-${cls==='ok2'?'ok':cls==='or'?'or':'al'}">${erroStr}</span></td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('combo-resultado').style.display = 'block';
+  document.getElementById('combo-resultado').scrollIntoView({behavior:'smooth'});
+}
+
+function irCombinacoesDe(origem) {
+  let tipo='semente', espac, z1, z2, obs, cultura='Soja';
+  if (origem==='soja') {
+    espac=document.getElementById('s-esp').value;
+    z1=document.getElementById('s-z1').value;
+    z2=document.getElementById('s-z2').value;
+    obs=document.getElementById('s-obt').value;
+    cultura='Soja';
+  } else if (origem==='milho') {
+    espac=document.getElementById('m-esp').value;
+    z1=document.getElementById('m-z1').value;
+    z2=document.getElementById('m-z2').value;
+    obs=document.getElementById('m-obt').value;
+    cultura='Milho';
+  } else if (origem==='outras') {
+    espac=document.getElementById('o-esp').value;
+    z1=document.getElementById('o-z1').value;
+    z2=document.getElementById('o-z2').value;
+    obs=document.getElementById('o-obt').value;
+    cultura=culturaSelecionada;
+  } else if (origem==='adubo') {
+    tipo='adubo';
+    espac=document.getElementById('d-lar').value||45;
+    z1=document.getElementById('d-z1').value;
+    z2=document.getElementById('d-z2').value;
+    obs=document.getElementById('d-dose').value;
+    cultura='Soja';
+  } else if (origem==='adubo-soja') {
+    tipo='adubo';
+    espac=document.getElementById('s-esp').value||45;
+    z1=document.getElementById('sa-z1').value;
+    z2=document.getElementById('sa-z2').value;
+    obs=document.getElementById('sa-des').value;
+    cultura='Soja';
+  }
+  document.getElementById('cal-tipo').value = tipo;
+  if (espac) document.getElementById('cal-espac').value = espac;
+  if (z1) document.getElementById('cal-z1').value = z1;
+  if (z2) document.getElementById('cal-z2').value = z2;
+  if (obs) document.getElementById('cal-res').value = obs;
+  const cr = CULTURAS_REF[cultura];
+  if (cr) document.getElementById('cal-meta').value = cr.popPad;
+  document.getElementById('cal-cultura').value = cultura;
+  calcK();
+  ir('combinacoes');
+}
+
+function atualizarRefCombo() {
+  const c = CULTURAS_REF[document.getElementById('cal-cultura').value];
+  if (c && !document.getElementById('cal-meta').value)
+    document.getElementById('cal-meta').value = c.popPad;
+  if (c && !document.getElementById('cal-espac').value)
+    document.getElementById('cal-espac').value = c.espPad;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CÁLCULOS
+// ═══════════════════════════════════════════════════════════════
+function calcSoja() {
+  const esp=parseFloat(v('s-esp')),des=parseFloat(v('s-des')),obt=parseFloat(v('s-obt'));
+  const z1=parseFloat(v('s-z1')),z2=parseFloat(v('s-z2'));
+  if (esp>0&&des>0) { setRes('s-r-des','s-v-des',Math.round(des*10000/(esp/100)),'ok2'); }
+  if (esp>0&&obt>0) {
+    const dO=Math.round(obt*10000/(esp/100));
+    setRes('s-r-obt','s-v-obt',dO,'ok2');
+    if (des>0) {
+      const dD=Math.round(des*10000/(esp/100));
+      const dif=((dO-dD)/dD*100).toFixed(1);
+      setTxt('s-v-dif',(dif>0?'+':'')+dif+'%');
+      document.getElementById('s-r-dif').className='res '+(Math.abs(dif)<=5?'ok2':'al');
+      if (z1>0&&z2>0&&obt>0) {
+        const sug=Math.round(z1*(dD/dO));
+        setTxt('s-v-sug',sug+' dentes');
+      }
+    }
+  }
+}
+
+function calcMilho() {
+  const esp=parseFloat(v('m-esp'))||70,des=parseFloat(v('m-des')),obt=parseFloat(v('m-obt'));
+  const ger=(parseFloat(v('m-ger'))||92)/100;
+  const z1=parseFloat(v('m-z1')),z2=parseFloat(v('m-z2'));
+  if (esp>0&&des>0) { const plD=Math.round(des*10000/(esp/100)*ger); setRes('m-r-des','m-v-des',plD,'ok2'); }
+  if (esp>0&&obt>0) {
+    const plO=Math.round(obt*10000/(esp/100)*ger);
+    setRes('m-r-obt','m-v-obt',plO,'ok2');
+    if (des>0) {
+      const plD=Math.round(des*10000/(esp/100)*ger);
+      const dif=((plO-plD)/plD*100).toFixed(1);
+      setTxt('m-v-dif',(dif>0?'+':'')+dif+'%');
+      document.getElementById('m-r-dif').className='res '+(Math.abs(dif)<=5?'ok2':'al');
+      if (z1>0&&z2>0&&obt>0)
+        setTxt('m-v-sug',Math.round(z1*(des/obt))+' dentes');
+    }
+  }
+}
+
+function calcOutras() {
+  const esp=parseFloat(v('o-esp')),des=parseFloat(v('o-des')),obt=parseFloat(v('o-obt'));
+  const ger=(parseFloat(v('o-ger'))||85)/100;
+  const z1=parseFloat(v('o-z1')),z2=parseFloat(v('o-z2'));
+  if (esp>0&&des>0) { setRes('o-r-des','o-v-des',Math.round(des*10000/(esp/100)),'ok2'); }
+  if (esp>0&&obt>0) {
+    const dO=Math.round(obt*10000/(esp/100));
+    setRes('o-r-obt','o-v-obt',dO,'ok2');
+    const plO=Math.round(dO*ger);
+    setRes('o-r-pl','o-v-pl',plO,'am');
+    if (des>0) {
+      const dD=Math.round(des*10000/(esp/100));
+      const dif=((dO-dD)/dD*100).toFixed(1);
+      setTxt('o-v-dif',(dif>0?'+':'')+dif+'%');
+      document.getElementById('o-r-dif').className='res '+(Math.abs(dif)<=5?'ok2':'al');
+      if (z1>0&&z2>0&&obt>0) setTxt('o-v-sug',Math.round(z1*(des/obt))+' dentes');
+    }
+  }
+}
+
+function calcAdubSoja() {
+  const des  = parseFloat(v('sa-des'));
+  const lin  = parseFloat(v('sa-lin')) || parseFloat(v('s-lin')) || 1;
+  const esp  = parseFloat(v('s-esp'))  || 45;
+  const z1   = parseFloat(v('sa-z1'));
+  const z2   = parseFloat(v('sa-z2'));
+  const dist = parseFloat(v('sa-dist'));
+  const peso = parseFloat(v('sa-peso'));
+
+  if (des > 0) {
+    setTxt('sa-v-des', des.toFixed(0));
+    document.getElementById('sa-r-des').className = 'res ok2';
+  }
+
+  if (lin > 0 && esp > 0 && dist > 0 && peso > 0) {
+    // Área coletada (ha) = nLinhas × espaç(m) × distância(m) / 10000
+    const areaHa  = (lin * (esp / 100) * dist) / 10000;
+    const doseObt = peso / areaHa;
+    setTxt('sa-v-obt', doseObt.toFixed(1));
+    document.getElementById('sa-r-obt').className = 'res ok2';
+
+    if (des > 0) {
+      const dif = ((doseObt - des) / des * 100).toFixed(1);
+      setTxt('sa-v-dif', (dif > 0 ? '+' : '') + dif + '%');
+      document.getElementById('sa-r-dif').className = 'res ' + (Math.abs(dif) <= 5 ? 'ok2' : 'al');
+
+      if (z1 > 0 && z2 > 0 && doseObt > 0) {
+        const sug = Math.round(z1 * (des / doseObt));
+        setTxt('sa-v-sug', sug + ' dentes');
+      }
+    }
+  }
+}
+
+function calcPop() {
+  const esp=parseFloat(v('p-esp')),sem=parseFloat(v('p-sem')),ger=(parseFloat(v('p-ger'))||90)/100;
+  if (esp>0&&sem>0) {
+    const sH=Math.round(sem*10000/(esp/100));
+    const pH=Math.round(sH*ger);
+    setTxt('p-v-sem',fmt(sH));
+    setTxt('p-v-pl',fmt(pH));
+    const el=document.getElementById('p-r-st');
+    if (pH>=200000&&pH<=340000) { setTxt('p-v-st','DENTRO DO IDEAL ✓'); el.className='res ok2'; setTxt('p-v-un','ideal soja: 200k–340k'); }
+    else if (pH<200000) { setTxt('p-v-st','ABAIXO ↓'); el.className='res al'; }
+    else { setTxt('p-v-st','ACIMA ↑'); el.className='res al'; }
+  }
+}
+
+function calcPulv() {
+  const bar=parseFloat(v('pv-bar')),esp=(parseFloat(v('pv-esp'))||50)/100;
+  const vel=parseFloat(v('pv-vel')),vaz=parseFloat(v('pv-vaz')),dose=parseFloat(v('pv-dose'));
+  if (bar>0&&vel>0&&vaz>0&&esp>0) {
+    const nb=Math.round(bar/esp);
+    const vol=(vaz*600*nb)/(bar*vel);
+    setTxt('pv-v-vol',vol.toFixed(1));
+    if (dose>0) {
+      const dif=((vol-dose)/dose*100).toFixed(1);
+      setTxt('pv-v-dif',(dif>0?'+':'')+dif+'%');
+      document.getElementById('pv-r-dif').className='res '+(Math.abs(dif)<=5?'ok2':'al');
+    }
+  }
+}
+
+function calcDist() {
+  const lar=parseFloat(v('d-lar')),vel=parseFloat(v('d-vel'));
+  const dose=parseFloat(v('d-dose')),peso=parseFloat(v('d-peso'));
+  const z1=parseFloat(v('d-z1')),z2=parseFloat(v('d-z2'));
+  if (lar>0&&vel>0&&dose>0) {
+    const teo=dose*(vel/3.6)*lar*30/10000;
+    setTxt('d-v-teo',teo.toFixed(2)+' kg');
+    if (peso>0) {
+      const dif=((peso-teo)/teo*100).toFixed(1);
+      const ok=Math.abs(dif)<=5;
+      setTxt('d-v-st',ok?'REGULADO ✓ ('+dif+'%)':'AJUSTAR: '+(dif>0?'+':'')+dif+'%');
+      document.getElementById('d-r-st').className='res '+(ok?'ok2':'al');
+      if (z1>0&&z2>0&&teo>0&&peso>0)
+        setTxt('d-v-sug',Math.round(z1*(teo/peso))+' dentes');
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// OUTRAS CULTURAS
+// ═══════════════════════════════════════════════════════════════
+function selecionarCultura(cult) {
+  culturaSelecionada = cult;
+  document.querySelectorAll('.cult-btn').forEach(b=>b.classList.remove('on'));
+  const el=document.getElementById('cb-'+cult);
+  if (el) el.classList.add('on');
+  const ref=CULTURAS_REF[cult];
+  if (ref) {
+    document.getElementById('o-esp').value = ref.espPad;
+    document.getElementById('cult-ref-label').textContent = 'Referência ' + cult;
+    document.getElementById('cult-ref-pop').textContent = fmt(ref.popMin)+' – '+fmt(ref.popMax);
+    document.getElementById('cult-ref-esp').textContent = ref.un+' · espaç. padrão: '+ref.espPad+'cm';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BANCO DE DADOS
+// ═══════════════════════════════════════════════════════════════
+let marcaFiltro = '';
+
+function renderChipsMarca() {
+  const marcas = [...new Set(BD.map(m=>m.fab))].sort();
+  const chips = document.getElementById('bd-chips');
+  chips.innerHTML = `<div class="chip on" onclick="filtrarMarca('')">Todos</div>` +
+    marcas.map(m=>`<div class="chip" onclick="filtrarMarca('${m}')">${m}</div>`).join('');
+}
+
+function filtrarMarca(marca) {
+  marcaFiltro = marca;
+  document.querySelectorAll('#bd-chips .chip').forEach(c=>{
+    c.classList.toggle('on', c.textContent===(marca||'Todos'));
+  });
+  filtrarBD();
+}
+
+function filtrarBD() {
+  const t = (document.getElementById('bd-busca').value||'').toLowerCase();
+  const lista = BD.filter(m=>
+    (!marcaFiltro || m.fab===marcaFiltro) &&
+    (!t || m.fab.toLowerCase().includes(t)||m.mod.toLowerCase().includes(t)||m.cult.toLowerCase().includes(t))
+  );
+  renderBD(lista);
+}
+
+function renderBD(lista) {
+  const el = document.getElementById('bd-lista');
+  if (!lista.length) { el.innerHTML='<div class="vazio"><div class="ic">🔍</div><p>Nenhum resultado</p></div>'; return; }
+  el.innerHTML = lista.map(m=>`
+    <div class="maq" onclick="usarMaquina('${m.fab}','${m.mod}',${m.lin},${m.esp},'${m.disco}','${m.kit}')">
+      <div class="fab">${m.fab} — <span style="color:#888">${m.cult}</span></div>
+      <div class="mod">${m.mod}</div>
+      <div class="inf"><span>📏 ${m.lin} linhas</span><span>↔ ${m.esp}cm</span><span>💿 ${m.disco}</span><span>${m.tipo}</span></div>
+      <div class="eng-info">Kit engrenagens: ${(KITS_ENGRENAGENS[m.kit]||[]).join(' · ')}</div>
+    </div>`).join('');
+}
+
+function usarMaquina(fab,mod,lin,esp,disco,kit) {
+  document.getElementById('s-fab').value=fab;
+  document.getElementById('s-mod').value=mod;
+  document.getElementById('s-lin').value=lin;
+  document.getElementById('s-esp').value=esp;
+  document.getElementById('s-disc').value=disco;
+  if (KITS_ENGRENAGENS[kit]) {
+    engsSelecionadas = new Set(KITS_ENGRENAGENS[kit]);
+    document.getElementById('combo-marca').value = kit;
+    renderChipsEngs(KITS_ENGRENAGENS[kit]);
+  }
+  toast('Máquina carregada — engrenagens configuradas');
+  ir('reg-soja');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// HISTÓRICO
+// ═══════════════════════════════════════════════════════════════
+function salvarSoja() {
+  const faz=v('s-faz'),prod=v('s-prod');
+  if (!faz&&!prod){toast('Informe fazenda ou produtor');return;}
+  const esp=parseFloat(v('s-esp')),des=parseFloat(v('s-des')),obt=parseFloat(v('s-obt'));
+  const dD=esp&&des?Math.round(des*10000/(esp/100)):0;
+  const dO=esp&&obt?Math.round(obt*10000/(esp/100)):0;
+  salvarHist({tipo:'Soja',data:v('s-data')||hoje(),fazenda:faz,produtor:prod,municipio:v('s-mun'),
+    maquina:v('s-fab')+' '+v('s-mod'),espac:esp,doseDesejada:dD,doseObtida:dO,
+    diferenca:dD&&dO?((dO-dD)/dD*100).toFixed(1):'—'});
+}
+function salvarMilho() {
+  const faz=v('m-faz'),prod=v('m-prod');
+  if (!faz&&!prod){toast('Informe fazenda ou produtor');return;}
+  salvarHist({tipo:'Milho',data:v('m-data')||hoje(),fazenda:faz,produtor:prod,municipio:v('m-mun'),
+    maquina:v('m-fab')+' '+v('m-mod'),espac:v('m-esp')||70,doseDesejada:'—',doseObtida:'—',diferenca:'—'});
+}
+function salvarOutras() {
+  const faz=v('o-faz'),prod=v('o-prod');
+  if (!faz&&!prod){toast('Informe fazenda ou produtor');return;}
+  salvarHist({tipo:culturaSelecionada,data:v('o-data')||hoje(),fazenda:faz,produtor:prod,municipio:v('o-mun'),
+    maquina:v('o-fab')+' '+v('o-mod'),espac:v('o-esp'),doseDesejada:'—',doseObtida:'—',diferenca:'—'});
+}
+function salvarHist(reg) {
+  const h=JSON.parse(localStorage.getItem('vm-hist')||'[]');
+  h.unshift({...reg,id:Date.now()});
+  localStorage.setItem('vm-hist',JSON.stringify(h));
+  toast('Salvo no histórico!');
+}
+function renderHistorico() {
+  const h=JSON.parse(localStorage.getItem('vm-hist')||'[]');
+  const el=document.getElementById('hist-lista');
+  if (!h.length){el.innerHTML='<div class="vazio"><div class="ic">📋</div><p>Nenhuma regulagem salva.</p></div>';return;}
+  el.innerHTML=h.map(r=>{
+    const dif=parseFloat(r.diferenca);
+    const b=isNaN(dif)?'':Math.abs(dif)<=5?'<span class="badge badge-ok">OK</span>':'<span class="badge badge-al">Fora</span>';
+    return `<div class="hist-item">
+      <div class="dt">${fmtData(r.data)} · ${r.tipo} ${b}</div>
+      <div class="nm">${r.fazenda} — ${r.produtor}</div>
+      <div class="det">${r.municipio} · ${r.maquina}${r.doseDesejada&&r.doseDesejada!=='—'?' · Meta: '+fmt(r.doseDesejada)+' sem/ha':''}</div>
+    </div>`;
+  }).join('');
+}
+function limparHist(){if(confirm('Apagar todo o histórico?')){localStorage.removeItem('vm-hist');renderHistorico();toast('Histórico apagado');}}
+
+// ═══════════════════════════════════════════════════════════════
+// RELATÓRIO
+// ═══════════════════════════════════════════════════════════════
+function gerarRelSoja() {
+  const esp=parseFloat(v('s-esp')),des=parseFloat(v('s-des')),obt=parseFloat(v('s-obt'));
+  const z1=v('s-z1'),z2=v('s-z2');
+  const dD=esp&&des?fmt(Math.round(des*10000/(esp/100)))+' sem/ha':'—';
+  const dO=esp&&obt?fmt(Math.round(obt*10000/(esp/100)))+' sem/ha':'—';
+  const dif=des&&obt?((obt-des)/des*100).toFixed(1)+'%':'—';
+  const sug=z1&&z2&&des&&obt?Math.round(parseFloat(z1)*(des/obt))+' dentes':'—';
+  s('rl-faz',v('s-faz'));s('rl-prod',v('s-prod'));s('rl-data',fmtData(v('s-data')));
+  s('rl-mun',v('s-mun'));s('rl-cult','Soja');s('rl-maq',v('s-fab')+' '+v('s-mod'));
+  s('rl-esp',esp?esp+' cm':'—');s('rl-disc',v('s-disc'));
+  s('rl-z1',z1?z1+' dentes':'—');s('rl-z2',z2?z2+' dentes':'—');
+  s('rl-des',dD);s('rl-obt',dO);s('rl-dif',dif);s('rl-sug',sug);
+  ir('relatorio');
+}
+function limparSoja(){['s-faz','s-prod','s-mun','s-fab','s-mod','s-lin','s-disc','s-des','s-obt','s-z1','s-z2'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=''});['s-v-des','s-v-obt','s-v-dif','s-v-sug'].forEach(id=>setTxt(id,'—'));}
+
+// ═══════════════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════════════
+function v(id){const e=document.getElementById(id);return e?e.value:'';}
+function s(id,val){const e=document.getElementById(id);if(e)e.textContent=val||'—';}
+function setTxt(id,val){const e=document.getElementById(id);if(e)e.textContent=val;}
+function setRes(boxId,valId,val,cls){
+  const b=document.getElementById(boxId);const e=document.getElementById(valId);
+  if(b)b.className='res '+(cls||'');if(e)e.textContent=fmt(val);
+}
+function fmt(n){if(!n&&n!==0)return'—';return Number(n).toLocaleString('pt-BR');}
+function fmtData(d){if(!d)return'—';const[a,m,di]=d.split('-');return di+'/'+m+'/'+a;}
+function hoje(){return new Date().toISOString().slice(0,10);}
+function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500);}
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  const hj=hoje();
+  ['s-data','m-data','o-data'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=hj;});
+  selecionarCultura('Algodão');
+  renderChipsEngs([10,12,14,16,18,20,22,24,26,28,30]);
+});
+if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script>
+</body>
+</html>
